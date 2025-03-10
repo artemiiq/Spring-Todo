@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список нотаток</title>
+</head>
+<body>
+    <h1>Список нотаток</h1>
+    <ul>
+        <li th:each="note : ${notes}">
+            <b th:text="${note.title}"></b>: <span th:text="${note.content}"></span>
+            <a th:href="@{/note/edit(id=${note.id})}">Редагувати</a>
+            <form th:action="@{/note/delete}" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${note.id}" />
+                <button type="submit">Видалити</button>
+            </form>
+        </li>
+    </ul>
+    <h2>Додати нотатку</h2>
+    <form action="/note/add" method="post">
+        <label>Заголовок: <input type="text" name="title" required /></label><br/>
+        <label>Контент: <textarea name="content" required></textarea></label><br/>
+        <button type="submit">Додати</button>
+    </form>
+    
+</body>
+</html>
