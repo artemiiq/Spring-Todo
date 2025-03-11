@@ -4,61 +4,47 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 @Controller
 @RequestMapping("/note")
-class NoteController {
-    private final List<Note> notes = new ArrayList<>();
+public class NoteController {
+    private final NoteService noteService;
+
+    public NoteController(NoteService noteService) {
+        this.noteService = noteService;
+    }
 
     @GetMapping("/list")
     public String listNotes(Model model) {
-        model.addAttribute("notes", notes);
+        model.addAttribute("notes", noteService.listAll());
         return "note_list";
     }
 
     @PostMapping("/delete")
-    public String deleteNote(@RequestParam("id") int id) {
-        Iterator<Note> iterator = notes.iterator();
-        while (iterator.hasNext()) {
-            if (iterator.next().getId() == id) {
-                iterator.remove();
-                break;
-            }
-        }
+    public String deleteNote(@RequestParam("id") long id) {
+        noteService.deleteById(id);
         return "redirect:/note/list";
     }
 
     @GetMapping("/edit")
-    public String editNotePage(@RequestParam("id") int id, Model model) {
-        for (Note note : notes) {
-            if (note.getId() == id) {
-                model.addAttribute("note", note);
-                break;
-            }
-        }
+    public String editNotePage(@RequestParam("id") long id, Model model) {
+        model.addAttribute("note", noteService.getById(id));
         return "note_edit";
     }
 
     @PostMapping("/edit")
-    public String editNote(@RequestParam("id") int id, @RequestParam("title") String title, @RequestParam("content") String content) {
-        for (Note note : notes) {
-            if (note.getId() == id) {
-                note.setTitle(title);
-                note.setContent(content);
-                break;
-            }
-        }
+    public String editNote(@RequestParam("id") long id, 
+                            @RequestParam("title") String title, 
+                            @RequestParam("content") String content) {
+        Note note = new Note(id, title, content);
+        noteService.update(note);
         return "redirect:/note/list";
     }
 
     @PostMapping("/add")
-public String addNote(@RequestParam("id") long id, 
-                    @RequestParam("title") String title, 
-                    @RequestParam("content") String content) {
-    notes.add(new Note(id, title, content));
-    return "redirect:/note/list";
+    public String addNote(@RequestParam("title") String title, 
+                            @RequestParam("content") String content) {
+        Note note = new Note(0, title, content); // ID генерується в сервісі
+        noteService.add(note);
+        return "redirect:/note/list";
     }
 }
