@@ -1,42 +1,41 @@
 package com.example;
 
-import java.util.ArrayList;
+import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.springframework.stereotype.Service;
-
 @Service
 public class NoteService {
-    private final List<Note> notes = new ArrayList<>();
-    private long idCounter = 1;
+    private final NoteRepository noteRepository;
+
+    public NoteService(NoteRepository noteRepository) {
+        this.noteRepository = noteRepository;
+    }
 
     public List<Note> listAll() {
-        return new ArrayList<>(notes);
+        return noteRepository.findAll();
     }
 
     public Note add(Note note) {
-        long id = idCounter++;
-        note.setId(id);
-        notes.add(note);
-        return note;
+        return noteRepository.save(note);
     }
 
     public void deleteById(long id) {
-        Note note = getById(id);
-        notes.remove(note);
+        if (!noteRepository.existsById(id)) {
+            throw new NoSuchElementException("Note not found");
+        }
+        noteRepository.deleteById(id);
     }
 
     public void update(Note note) {
-        Note existingNote = getById(note.getId());
-        int index = notes.indexOf(existingNote);
-        notes.set(index, note);
+        if (!noteRepository.existsById(note.getId())) {
+            throw new NoSuchElementException("Note not found");
+        }
+        noteRepository.save(note);
     }
 
     public Note getById(long id) {
-        return notes.stream()
-                .filter(note -> note.getId() == id)
-                .findFirst()
+        return noteRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Note not found"));
     }
 }

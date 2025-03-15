@@ -43,8 +43,9 @@ public class NoteController {
     @PostMapping("/add")
     public String addNote(@RequestParam("title") String title, 
                             @RequestParam("content") String content) {
-        Note note = new Note(0, title, content); // ID генерується в сервісі
+        Note note = new Note();
         noteService.add(note);
         return "redirect:/note/list";
     }
+    
 }
