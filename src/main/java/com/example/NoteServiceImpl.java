@@ -1,29 +1,28 @@
 package com.example;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class NoteService {
+public class NoteServiceImpl implements NoteServiceInterface {
     private final NoteRepository noteRepository;
 
-    public NoteService(NoteRepository noteRepository) {
+    public NoteServiceImpl(NoteRepository noteRepository) {
         this.noteRepository = noteRepository;
     }
 
+    @Override
     public List<Note> listAll() {
         return noteRepository.findAll();
     }
 
-    @Transactional
+    @Override
     public Note add(Note note) {
         return noteRepository.save(note);
     }
 
-    @Transactional
+    @Override
     public void deleteById(long id) {
         if (!noteRepository.existsById(id)) {
             throw new NoSuchElementException("Note not found");
@@ -31,15 +30,18 @@ public class NoteService {
         noteRepository.deleteById(id);
     }
 
-    @Transactional
+    @Override
     public void update(Note note) {
-        if (!noteRepository.existsById(note.getId())) {
-            throw new NoteNotFoundException("Note with ID " + note.getId() + " not found");
-        }
-        noteRepository.save(note);
+        Note existingNote = noteRepository.findById(note.getId())
+                .orElseThrow(() -> new NoSuchElementException("Note not found"));
+        
+        existingNote.setTitle(note.getTitle());
+        existingNote.setContent(note.getContent());
+
+        noteRepository.save(existingNote);
     }
 
-    @Transactional(readOnly = true)
+    @Override
     public Note getById(long id) {
         return noteRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Note not found"));
