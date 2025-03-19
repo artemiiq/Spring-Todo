@@ -25,12 +25,6 @@ public class NoteController {
         return "redirect:/note/list";
     }
 
-    @GetMapping("/edit")
-    public String editNotePage(@RequestParam("id") long id, Model model) {
-        model.addAttribute("note", noteService.getById(id));
-        return "note_edit";
-    }
-
     @PostMapping("/edit")
     public String editNote(@ModelAttribute Note note) {
         noteService.update(note);

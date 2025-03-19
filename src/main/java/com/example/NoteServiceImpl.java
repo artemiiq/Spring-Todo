@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class NoteServiceImpl implements NoteServiceInterface {
+public class NoteServiceImpl implements NoteService {
     private final NoteRepository noteRepository;
 
     public NoteServiceImpl(NoteRepository noteRepository) {
