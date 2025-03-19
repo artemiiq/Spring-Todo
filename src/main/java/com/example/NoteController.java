@@ -3,7 +3,6 @@ package com.example;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.transaction.annotation.Transactional;
 
 @Controller
 @RequestMapping("/note")
@@ -33,15 +32,12 @@ public class NoteController {
     }
 
     @PostMapping("/edit")
-    public String editNote(@RequestParam("id") long id, 
-                            @RequestParam("title") String title, 
-                            @RequestParam("content") String content) {
-        Note note = new Note(id, title, content);
+    public String editNote(@ModelAttribute Note note) {
         noteService.update(note);
         return "redirect:/note/list";
     }
+    
 
-    @Transactional
     @PostMapping("/add")
     public String addNote(@ModelAttribute Note note) {
         noteService.add(note);
